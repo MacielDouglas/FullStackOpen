@@ -56,9 +56,6 @@ const App = (props) => {
   const [neutral, setNeutral] = useState(0);
   const [bad, setBad] = useState(0);
 
-  const [selected, setSelected] = useState(0);
-  const [points, setPoints] = useState([4, 2, 9, 2, 12, 3]);
-
   const setToGood = (newValue) => {
     setGood(newValue);
   };
@@ -69,47 +66,18 @@ const App = (props) => {
     setBad(newValue);
   };
 
-  const setToAnecdotes = (nvl) => {
-    if (nvl < props.anecdotes.length) {
-      setSelected(nvl);
-    } else {
-      setSelected(0);
-    }
-  };
-
-  const copy = [...points];
-  const max = Math.max(...copy);
-  const maior = copy.indexOf(max);
-
-  const voteAnecdotes = (selected) => {
-    copy[selected] += 1;
-    setPoints([...copy]);
-  };
-
   return (
     <div>
       <h1>Give Feedback</h1>
       <Button handleClick={() => setToGood(good + 1)} text="Good" />
       <Button handleClick={() => setToNeutral(neutral + 1)} text="Neutral" />
       <Button handleClick={() => setToBad(bad + 1)} text="Bad" />
-
       <h2>Statistics</h2>
       <table>
         <tbody>
           <Statistics good={good} neutral={neutral} bad={bad} />
         </tbody>
       </table>
-      <div>{props.anecdotes[selected]}</div>
-      <p>has {copy[selected]} votes</p>
-      <Button handleClick={() => voteAnecdotes(selected)} text="VOTE" />
-      <Button
-        handleClick={() => setToAnecdotes(selected + 1)}
-        text="NEXT Anecdote"
-      />
-      <div>
-        <h2>Anecdote with most votes</h2>
-        <div>{props.anecdotes[maior]}</div>
-      </div>
     </div>
   );
 };
