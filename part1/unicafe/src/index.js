@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom/client';
 
+const anecdotes = [
+  'If it hurts, do it more often',
+  'Adding manpower to a late software project makes it later!',
+  'The first 90 percent of the code accounts for the first 90 percent of the development time...The remaining 10 percent of the code accounts for the other 90 percent of the development time.',
+  'Any fool can write code that a computer can understand. Good programmers write code that humans can understand.',
+  'Premature optimization is the root of all evil.',
+  'Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.',
+];
+
 const Button = (props) => (
   <button onClick={props.handleClick}>{props.text}</button>
 );
@@ -42,10 +51,13 @@ const Statistics = (props) => {
   );
 };
 
-const App = () => {
+const App = (props) => {
   const [good, setGood] = useState(0);
   const [neutral, setNeutral] = useState(0);
   const [bad, setBad] = useState(0);
+
+  const [selected, setSelected] = useState(0);
+  const [points, setPoints] = useState([4, 2, 9, 2, 12, 3]);
 
   const setToGood = (newValue) => {
     setGood(newValue);
@@ -55,6 +67,23 @@ const App = () => {
   };
   const setToBad = (newValue) => {
     setBad(newValue);
+  };
+
+  const setToAnecdotes = (nvl) => {
+    if (nvl < props.anecdotes.length) {
+      setSelected(nvl);
+    } else {
+      setSelected(0);
+    }
+  };
+
+  const copy = [...points];
+  const max = Math.max(...copy);
+  const maior = copy.indexOf(max);
+
+  const voteAnecdotes = (selected) => {
+    copy[selected] += 1;
+    setPoints([...copy]);
   };
 
   return (
@@ -70,6 +99,17 @@ const App = () => {
           <Statistics good={good} neutral={neutral} bad={bad} />
         </tbody>
       </table>
+      <div>{props.anecdotes[selected]}</div>
+      <p>has {copy[selected]} votes</p>
+      <Button handleClick={() => voteAnecdotes(selected)} text="VOTE" />
+      <Button
+        handleClick={() => setToAnecdotes(selected + 1)}
+        text="NEXT Anecdote"
+      />
+      <div>
+        <h2>Anecdote with most votes</h2>
+        <div>{props.anecdotes[maior]}</div>
+      </div>
     </div>
   );
 };
@@ -77,6 +117,6 @@ const App = () => {
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <>
-    <App />
+    <App anecdotes={anecdotes} />
   </>
 );
