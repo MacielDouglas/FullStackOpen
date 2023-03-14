@@ -1,0 +1,24 @@
+browser -> server: HTTP POST https://studies.cs.helsinki.fi/exemplepp/notes
+server -> browser: HTTP status code 302
+
+note over browser:
+to do a HTTP GET to the address /notes
+in note
+
+browser -> server: RELOAD
+
+browser -> server: HTTP GET https://studies.cs.helsinki.fi/exampleapp/main.js
+server -> browser: main.js
+
+browser -> server: HTTP GET https://studies.cs.helsinki.fi/exampleapp/main.css
+server -> browser: main.css
+
+browser -> server: HTTP GET https://studies.cs.helsinki.fi/exampleapp/data.json
+server -> browser: data.json
+
+note over browser:
+browser starts executing js-code
+that request CSS and JSON data
+server creates a new note object
+Adds the note to an array named as notes
+end note
