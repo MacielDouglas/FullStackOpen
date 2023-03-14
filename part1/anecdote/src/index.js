@@ -20,7 +20,9 @@ const App = () => {
   );
 
   const [selected, setSelected] = useState(0);
-  const [points, setPoints] = useState([4, 2, 9, 2, 12, 3, 7, 1]);
+  const [points, setPoints] = useState(
+    [...Array(anecdotes.length)].map(() => parseInt(Math.random() * 30))
+  );
 
   const setToAnecdotes = (nvl) => {
     if (nvl < anecdotes.length) {
@@ -50,6 +52,8 @@ const App = () => {
         text="NEXT Anecdote"
       />
       <div>
+        {points}
+        {/* {setPoints} */}
         <h2>Anecdote with most votes</h2>
         <div>{anecdotes[maior]}</div>
       </div>
