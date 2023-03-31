@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-// import Filter from './components/Filter';
+import Filter from './components/Filter';
 import PersonForm from './components/PersonForm';
 import Persons from './components/Persons';
 
 const App = () => {
-  // const [persons, setPersons] = useState([]);
   const [persons, setPersons] = useState([
     { name: 'Arto Hellas', number: '040-123456', id: 1 },
     { name: 'Ada Lovelace', number: '39-44-5323523', id: 2 },
@@ -44,29 +43,49 @@ const App = () => {
   };
 
   //Filtro de pessoas
-  const people = persons.map((person) => person.name.toLowerCase());
+  const people = persons.map(
+    (person) => `${person.name.toLowerCase()}` + ' ' + `${person.number}`
+  );
 
   const filterItems = (batata) => {
     const valor = people.filter((names) => names.indexOf(batata) > -1);
     if (valor.length !== 0) {
       return valor;
     }
-    return 'Nome não encontrado';
+    return false;
   };
-  console.log(filterItems(filterInput.toLowerCase()));
+
+  const mostrar = filterItems(filterInput.toLowerCase());
 
   const handleFilterChange = (event) => {
     setFilterInput(event.target.value);
+    // if (mostrar) {
+    //   console.log(mostrar);
+    // } else {
+    //   return false;
+    // }
   };
 
   return (
     <>
       <h2>Phonebook</h2>
-      <form>
+      <Filter
+        filterInput={filterInput}
+        handleFilterChange={handleFilterChange}
+      />
+      <h3>Add a new</h3>
+      <PersonForm
+        addNewPerson={addNewPerson}
+        newName={newName}
+        handleNameChange={handleNameChange}
+        newNumber={newNumber}
+        handleNumberChange={handleNumberChange}
+      />
+
+      {/* <form>
         <div>
           filter shown with:
           <input value={filterInput} onChange={handleFilterChange} />
-          <div>Filter: {filterInput}</div>
         </div>
       </form>
       <h2>add a new</h2>
@@ -80,17 +99,22 @@ const App = () => {
         <div>
           <button type="submit">add</button>
         </div>
-      </form>
+      </form> */}
 
       <h2>Numbers</h2>
-      {persons.map((person) => (
+      {/* {mostrar ? (
+        mostrar.map((person, i) => <p key={i}>{person}</p>)
+      ) : (
+        <p>Not found</p>
+      )} */}
+
+      {/* {persons.map((person) => (
         <p key={person.id}>
           {person.name} {person.number}
         </p>
-      ))}
-      {/* <Filter /> */}
-      <PersonForm />
-      <Persons />
+      ))} */}
+
+      <Persons mostrar={mostrar} />
     </>
   );
 };
