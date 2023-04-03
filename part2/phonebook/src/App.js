@@ -2,59 +2,57 @@ import React, { useEffect, useState } from 'react';
 import Filter from './components/Filter';
 import PersonForm from './components/PersonForm';
 import Persons from './components/Persons';
-import axios from 'axios';
 
 import personsService from './services/persons';
 
 const App = () => {
-  // const [persons, setPersons] = useState([
-  //   { name: 'Arto Hellas', number: '040-123456', id: 1 },
-  //   { name: 'Ada Lovelace', number: '39-44-5323523', id: 2 },
-  //   { name: 'Dan Abramov', number: '12-43-234345', id: 3 },
-  //   { name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 },
-  // ]);
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [filterInput, setFilterInput] = useState('');
 
   useEffect(() => {
-    personsService.getAll().then((response) => {
-      setPersons(response.data);
+    personsService.getAll().then((initialPeaple) => {
+      setPersons(initialPeaple);
     });
   }, []);
 
-  // useEffect(() => {
-  //   console.log('effect: (efeito)');
-  //   axios.get('http://localhost:3001/persons').then((response) => {
-  //     console.log('promise fulfilled (promessa resolvida)');
-  //     setPersons(response.data);
-  //   });
-  // }, []);
-  // console.log('render (renderiza)', persons.length, 'persons (pessoas)');
-
   const addNewPerson = (event) => {
     event.preventDefault();
-    const id = persons.map((id) => id.id).pop();
+    const newNameC = newName.replace(/(^\w{1})|(\s+\w{1})/g, (letra) =>
+      letra.toUpperCase()
+    );
 
     const name = persons.map((person) => person.name);
-    if (name.includes(newName)) {
-      alert(`${newName} is already added to phonebook`);
+    if (name.includes(newNameC)) {
+      alert(`${newNameC} is already added to phonebook`);
       setNewName('');
       return;
     } else {
       const newPerson = {
-        id: id + 1,
-        name: newName,
+        name: newNameC,
         number: newNumber,
       };
-      axios
-        .post('http://localhost:3001/persons', newPerson)
-        .then((response) => {
-          console.log(response);
-          setPersons(persons.concat(newPerson));
-          setNewName('');
-          setNewNumber('');
+      personsService.create(newPerson).then((returnPeaple) => {
+        setPersons(persons.concat(returnPeaple));
+        setNewName('');
+        setNewNumber('');
+      });
+    }
+  };
+
+  const deleteItem = (id) => {
+    const remove = persons.find((n) => n.id === id);
+    const msg = window.confirm('quer sair');
+    if (msg) {
+      personsService
+        .remove(id)
+        .then((returnDelete) => {
+          setPersons(persons.filter((peaple) => peaple.id !== id));
+        })
+        .catch((error) => {
+          alert(`the peaple '${remove.name}' was already deleted from server`);
+          setPersons(persons.filter((n) => n.id !== id));
         });
     }
   };
@@ -67,14 +65,15 @@ const App = () => {
   };
 
   //Filtro de pessoas
-  const people = persons.map(
-    (person) => `${person.name.toLowerCase()}` + ' ' + `${person.number}`
-  );
+  const contacts = persons;
 
   const filterItems = (batata) => {
-    const valor = people.filter((names) => names.indexOf(batata) > -1);
-    if (valor.length !== 0) {
-      return valor;
+    const teste = contacts.filter(
+      (names) => names.name.toLowerCase().indexOf(batata) > -1
+    );
+
+    if (teste.length !== 0) {
+      return teste;
     }
     return false;
   };
@@ -83,11 +82,6 @@ const App = () => {
 
   const handleFilterChange = (event) => {
     setFilterInput(event.target.value);
-    // if (mostrar) {
-    //   console.log(mostrar);
-    // } else {
-    //   return false;
-    // }
   };
 
   return (
@@ -105,40 +99,8 @@ const App = () => {
         newNumber={newNumber}
         handleNumberChange={handleNumberChange}
       />
-
-      {/* <form>
-        <div>
-          filter shown with:
-          <input value={filterInput} onChange={handleFilterChange} />
-        </div>
-      </form>
-      <h2>add a new</h2>
-      <form onSubmit={addNewPerson}>
-        <div>
-          name: <input value={newName} onChange={handleNameChange} />
-        </div>
-        <div>
-          number: <input value={newNumber} onChange={handleNumberChange} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form> */}
-
       <h2>Numbers</h2>
-      {/* {mostrar ? (
-        mostrar.map((person, i) => <p key={i}>{person}</p>)
-      ) : (
-        <p>Not found</p>
-      )} */}
-
-      {/* {persons.map((person) => (
-        <p key={person.id}>
-          {person.name} {person.number}
-        </p>
-      ))} */}
-
-      <Persons mostrar={mostrar} />
+      <Persons mostrar={mostrar} deleteItem={deleteItem} />
     </>
   );
 };
