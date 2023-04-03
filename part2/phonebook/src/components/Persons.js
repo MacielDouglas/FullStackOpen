@@ -1,14 +1,16 @@
 import React from 'react';
 
-const Persons = ({ mostrar }) => {
+const Persons = ({ mostrar, deleteItem }) => {
+  // console.log(mostrar);
   return (
     <div>
       {mostrar ? (
-        mostrar.map((person, i) => (
-          <p key={i}>
-            {person.replace(/(^\w{1})|(\s+\w{1})/g, (letra) =>
-              letra.toUpperCase()
-            )}
+        mostrar.map((person) => (
+          <p key={person.id}>
+            {person.name} {person.number}{' '}
+            <button onClick={() => deleteItem(person.id)} value={person.id}>
+              delete
+            </button>
           </p>
         ))
       ) : (
