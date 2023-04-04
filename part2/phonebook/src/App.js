@@ -17,17 +17,16 @@ const App = () => {
     });
   }, []);
 
+  // Adicionar novo
   const addNewPerson = (event) => {
     event.preventDefault();
     const newNameC = newName.replace(/(^\w{1})|(\s+\w{1})/g, (letra) =>
       letra.toUpperCase()
     );
+    const names = persons.find((n) => n.name === newNameC);
 
-    const name = persons.map((person) => person.name);
-    if (name.includes(newNameC)) {
-      alert(`${newNameC} is already added to phonebook`);
-      setNewName('');
-      return;
+    if (names) {
+      updateItem(newNameC);
     } else {
       const newPerson = {
         name: newNameC,
@@ -41,13 +40,34 @@ const App = () => {
     }
   };
 
+  // alterar valor numero
+  const updateItem = (newNameC) => {
+    const msg = window.confirm(
+      `${newNameC} is already added to phonebook, replace the old number a new one?`
+    );
+    if (msg) {
+      const names = persons.find((n) => n.name === newNameC);
+      const id = names.id;
+      const newPerson = {
+        name: newNameC,
+        number: newNumber,
+      };
+      personsService.update(id, newPerson).then((response) => {
+        setPersons(persons.map((note) => (note.id !== id ? note : response)));
+      });
+      setNewName('');
+      setNewNumber('');
+    }
+  };
+
+  // Deletar item
   const deleteItem = (id) => {
     const remove = persons.find((n) => n.id === id);
-    const msg = window.confirm('quer sair');
+    const msg = window.confirm(`Delete ${remove.name}?`);
     if (msg) {
       personsService
         .remove(id)
-        .then((returnDelete) => {
+        .then(() => {
           setPersons(persons.filter((peaple) => peaple.id !== id));
         })
         .catch((error) => {
