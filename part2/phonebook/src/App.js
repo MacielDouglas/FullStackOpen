@@ -4,12 +4,15 @@ import PersonForm from './components/PersonForm';
 import Persons from './components/Persons';
 
 import personsService from './services/persons';
+import Notification from './components/Notification';
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [filterInput, setFilterInput] = useState('');
+  const [notificationMessage, setNotificacionMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     personsService.getAll().then((initialPeaple) => {
@@ -36,6 +39,8 @@ const App = () => {
         setPersons(persons.concat(returnPeaple));
         setNewName('');
         setNewNumber('');
+        messageResult({ message: 'Add' });
+        console.log(newNameC);
       });
     }
   };
@@ -45,25 +50,38 @@ const App = () => {
     const msg = window.confirm(
       `${newNameC} is already added to phonebook, replace the old number a new one?`
     );
-    if (msg) {
-      const names = persons.find((n) => n.name === newNameC);
-      const id = names.id;
-      const newPerson = {
-        name: newNameC,
-        number: newNumber,
-      };
-      personsService.update(id, newPerson).then((response) => {
+    // if (msg) {
+    const names = persons.find((n) => n.name === newNameC);
+    const id = names.id;
+    const newPerson = {
+      name: newNameC,
+      number: newNumber,
+    };
+    personsService
+      .update(id, newPerson)
+      .then((response) => {
+        messageResult({ message: 'Uppdated' });
         setPersons(persons.map((note) => (note.id !== id ? note : response)));
+      })
+      .catch((error) => {
+        setErrorMessage(
+          `Information of '${newNameC}' has already been removed from server.`
+        );
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
+        setPersons(persons.filter((n) => n.id !== id));
       });
-      setNewName('');
-      setNewNumber('');
-    }
+    setNewName('');
+    setNewNumber('');
+    // }
   };
 
   // Deletar item
   const deleteItem = (id) => {
     const remove = persons.find((n) => n.id === id);
     const msg = window.confirm(`Delete ${remove.name}?`);
+
     if (msg) {
       personsService
         .remove(id)
@@ -72,6 +90,7 @@ const App = () => {
         })
         .catch((error) => {
           alert(`the peaple '${remove.name}' was already deleted from server`);
+
           setPersons(persons.filter((n) => n.id !== id));
         });
     }
@@ -82,6 +101,15 @@ const App = () => {
   };
   const handleNumberChange = (event) => {
     setNewNumber(event.target.value);
+  };
+
+  // mensagem
+  const messageResult = ({ message }) => {
+    setNotificacionMessage(`${message} ${newName}.`);
+
+    setTimeout(() => {
+      setNotificacionMessage(null);
+    }, 5000);
   };
 
   //Filtro de pessoas
@@ -107,6 +135,7 @@ const App = () => {
   return (
     <>
       <h2>Phonebook</h2>
+      <Notification message={notificationMessage} error={errorMessage} />
       <Filter
         filterInput={filterInput}
         handleFilterChange={handleFilterChange}
