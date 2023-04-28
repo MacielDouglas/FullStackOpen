@@ -35,13 +35,22 @@ const App = () => {
         name: newNameC,
         number: newNumber,
       };
-      personsService.create(newPerson).then((returnPeaple) => {
-        setPersons(persons.concat(returnPeaple));
-        setNewName('');
-        setNewNumber('');
-        messageResult({ message: 'Add' });
-        console.log(newNameC);
-      });
+      personsService
+        .create(newPerson)
+        .then((returnPeaple) => {
+          setPersons(persons.concat(returnPeaple));
+          setNewName('');
+          setNewNumber('');
+          messageResult({ message: 'Add' });
+          // console.log(newNameC);
+        })
+        .catch((error) => {
+          setErrorMessage(error.response.data.error);
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 10000);
+          console.log(error.response.data.error);
+        });
     }
   };
 
