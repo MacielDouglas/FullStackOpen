@@ -1,4 +1,4 @@
-const Login = ({
+const Loginform = ({
   handleLogin,
   username,
   setUsername,
@@ -30,4 +30,4 @@ const Login = ({
   </>
 );
 
-export default Login;
+export default Loginform;
