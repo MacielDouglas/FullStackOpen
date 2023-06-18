@@ -1,12 +1,25 @@
-// import './index.css';
-
 import { useState } from 'react';
 
-const Blog = ({ blog }) => {
-  const [showAll, setShowAll] = useState(false);
+const Blog = ({ blog, addLike }) => {
+  const [showAll, setShoAll] = useState(false);
 
   const handleShow = () => {
-    showAll === false ? setShowAll(true) : setShowAll(false);
+    showAll === false ? setShoAll(true) : setShoAll(false);
+  };
+
+  // Adicionar Like
+  const handleAddLike = () => {
+    const id = blog.id;
+
+    const changeBlog = {
+      user: blog.user.id,
+      likes: blog.likes + 1,
+      author: blog.author,
+      title: blog.title,
+      url: blog.url,
+    };
+
+    addLike(id, changeBlog);
   };
 
   return (
@@ -14,25 +27,22 @@ const Blog = ({ blog }) => {
       {showAll ? (
         <>
           <p>
-            {blog.title}
-            <button onClick={() => handleShow()}>hide</button>
+            Title: {blog.title}
+            <button onClick={() => handleShow()}>hide</button> <br />
+            Url: {blog.url}
             <br />
-            url: {blog.url} <br /> likes: {blog.likes}
-            <button>like</button>
+            Likes: {blog.likes} <button onClick={handleAddLike}>like</button>
             <br />
-            author: {blog.author}
+            Author: {blog.author}
           </p>
         </>
       ) : (
-        <>
-          <p>
-            {blog.title}
-            <button onClick={() => handleShow()}>view</button>
-          </p>
-        </>
+        <p>
+          {blog.title}
+          <button onClick={() => handleShow()}>view</button>
+        </p>
       )}
     </div>
   );
 };
-
 export default Blog;

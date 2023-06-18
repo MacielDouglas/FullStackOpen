@@ -1,29 +1,26 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Blog from './components/Blog';
-import blogService from './services/blogs';
-import loginService from './services/login';
-import LoginForm from './components/LoginForm';
-import './index.css';
 import Notification from './components/Notification';
+import LoginForm from './components/LoginForm';
 import BlogForm from './components/BlogForm';
 import Togglable from './components/Togglable';
+import blogService from './services/blogs';
+import loginService from './services/login';
+import './index.css';
 
 const App = () => {
-  // const [loginVisible, setLoginVisible] = useState(false);
   const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [user, setUser] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
   const [message, setMessage] = useState(null);
-  const [newTitle, setNewTitle] = useState('');
-  const [newAuthor, setNewAuthor] = useState('');
-  const [newUrl, setNewUrl] = useState('');
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
   }, []);
 
+  // quando entrar na página, a aplicação verifique se os detalhes de um usuário logado já podem ser encontrados no local storage.
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser');
     if (loggedUserJSON) {
@@ -33,58 +30,13 @@ const App = () => {
     }
   }, []);
 
-  const handleLogin = async (event) => {
-    event.preventDefault();
+  const blogFormRef = useRef();
 
-    try {
-      const user = await loginService.login({
-        username,
-        password,
-      });
-
-      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user));
-      blogService.setToken(user.token);
-      setUser(user);
-      setUsername('');
-      setPassword('');
-      // messageResult({ message: `${user.name} logged in` });
-    } catch (exception) {
-      setErrorMessage(exception.response.data.error);
-      setTimeout(() => {
-        setErrorMessage(null);
-      }, 5000);
-    }
-  };
-
-  //Adicionar novo
-  const addNewBlog = (event) => {
-    event.preventDefault();
-    console.log('Funcionando');
-    const blogObject = {
-      title: newTitle,
-      author: newAuthor,
-      url: newUrl,
-    };
-
-    blogService.create(blogObject).then((returnedBlog) => {
-      setBlogs(blogs.concat(returnedBlog));
-      messageResult({ message: `A new blog: ${newTitle} added` });
-      setNewTitle('');
-      setNewAuthor('');
-      setNewUrl('');
-    });
-  };
-
-  const handleTitleChange = (event) => {
-    setNewTitle(event.target.value);
-  };
-
-  const handleAuthorChange = (event) => {
-    setNewAuthor(event.target.value);
-  };
-
-  const handleUrlChange = (event) => {
-    setNewUrl(event.target.value);
+  const handleLogout = () => {
+    setUser(null);
+    setUsername('');
+    setPassword('');
+    localStorage.clear();
   };
 
   const messageResult = ({ message }) => {
@@ -94,53 +46,81 @@ const App = () => {
     }, 5000);
   };
 
-  const handleLogout = () => {
-    setUser(null);
-    setUsername('');
-    setPassword('');
-    localStorage.clear();
+  // Adicionar novo Blog
+  const newBlog = async (blogObject) => {
+    blogFormRef.current.toggleVisibility();
+    try {
+      const newPost = await blogService.create(blogObject);
+      setBlogs(blogs.concat(newPost));
+      messageResult({ message: `A new blog: ${blogObject.title} added` });
+    } catch (error) {
+      setErrorMessage(error.response.data.error);
+      console.log('Erro:1', errorMessage);
+      setTimeout(() => {
+        setErrorMessage(null);
+        console.log('Erro 2', errorMessage);
+      }, 5000);
+    }
+  };
+
+  //Adicionar Like
+  const addLike = async (id, changeBlog) => {
+    try {
+      const updateBlog = await blogService.update(id, changeBlog);
+      const newBlog = blogs.map((blog) => (blog.id === id ? updateBlog : blog));
+      setBlogs(newBlog);
+    } catch (exception) {
+      setErrorMessage(exception.response.data.error);
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+    }
   };
 
   if (user === null) {
     return (
       <div>
         <h2>Log in to application</h2>
-        <Notification errormessage={errorMessage} />
-
+        <Notification errorMessage={errorMessage} />
         <LoginForm
-          handleLogin={handleLogin}
+          user={user}
+          setUser={setUser}
           username={username}
           setUsername={setUsername}
           password={password}
           setPassword={setPassword}
+          setErrorMessage={setErrorMessage}
+          loginService={loginService}
+          blogService={blogService}
         />
       </div>
     );
   }
+
   return (
     <div>
       <h2>blogs</h2>
-
       <Notification message={message} />
+      <Notification errorMessage={errorMessage} />
       <p>
         {`${user.name}`} logged in{' '}
         <button onClick={handleLogout}>Logout</button>
       </p>
-      <Togglable buttonLabel="new note">
-        <BlogForm
-          addNewBlog={addNewBlog}
-          newTitle={newTitle}
-          handleTitleChange={handleTitleChange}
-          newAuthor={newAuthor}
-          handleAuthorChange={handleAuthorChange}
-          newUrl={newUrl}
-          handleUrlChange={handleUrlChange}
-        />
+      <Togglable buttonLabel="new note" ref={blogFormRef}>
+        <BlogForm createBlog={newBlog} />
       </Togglable>
-
-      {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
-      ))}
+      {blogs ? (
+        <>
+          {blogs.map((blog) => (
+            <Blog key={blog.id} blog={blog} addLike={addLike} />
+          ))}
+        </>
+      ) : (
+        <>
+          {console.log('Blog: ', blogs)}
+          'Carregando'
+        </>
+      )}
     </div>
   );
 };

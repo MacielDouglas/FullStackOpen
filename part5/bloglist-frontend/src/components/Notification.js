@@ -1,5 +1,5 @@
-const Notification = ({ message, errormessage }) => {
-  if (errormessage === null || message === null) {
+const Notification = ({ message, errorMessage }) => {
+  if (errorMessage === null || message === null) {
     return null;
   }
   return (
@@ -7,7 +7,7 @@ const Notification = ({ message, errormessage }) => {
       {message ? (
         <div className="message">{message}</div>
       ) : (
-        <div className="error">{errormessage}</div>
+        <div className="error">{errorMessage}</div>
       )}
     </>
   );
