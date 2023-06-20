@@ -47,6 +47,7 @@ const LoginForm = ({
             value={password}
             name="Password"
             onChange={({ target }) => setPassword(target.value)}
+            autoComplete="false"
           />
         </div>
         <button type="submit">login</button>
