@@ -77,7 +77,7 @@ const App = () => {
 
       const deletedBlog = blogs.filter((blog) => blog.id !== id);
       setBlogs(deletedBlog);
-      messageResult({ message: `Blog removed` });
+      messageResult({ message: 'Blog removed' });
     } catch (error) {
       messageResult({ error: `${error}` });
     }
