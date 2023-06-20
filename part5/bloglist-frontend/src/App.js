@@ -39,10 +39,11 @@ const App = () => {
     localStorage.clear();
   };
 
-  const messageResult = ({ message }) => {
-    setMessage(`${message}.`);
+  const messageResult = ({ message, error }) => {
+    message ? setMessage(`${message}.`) : setErrorMessage(`${error}`);
     setTimeout(() => {
       setMessage(null);
+      setErrorMessage(null);
     }, 5000);
   };
 
@@ -54,12 +55,7 @@ const App = () => {
       setBlogs(blogs.concat(newPost));
       messageResult({ message: `A new blog: ${blogObject.title} added` });
     } catch (error) {
-      setErrorMessage(error.response.data.error);
-      console.log('Erro:1', errorMessage);
-      setTimeout(() => {
-        setErrorMessage(null);
-        console.log('Erro 2', errorMessage);
-      }, 5000);
+      messageResult({ error: `${error.response.data.error}` });
     }
   };
 
@@ -70,10 +66,20 @@ const App = () => {
       const newBlog = blogs.map((blog) => (blog.id === id ? updateBlog : blog));
       setBlogs(newBlog);
     } catch (exception) {
-      setErrorMessage(exception.response.data.error);
-      setTimeout(() => {
-        setErrorMessage(null);
-      }, 5000);
+      messageResult({ error: `${exception.response.data.error}` });
+    }
+  };
+
+  //remove
+  const removeBlog = async (id) => {
+    try {
+      await blogService.remove(id);
+
+      const deletedBlog = blogs.filter((blog) => blog.id !== id);
+      setBlogs(deletedBlog);
+      messageResult({ message: `Blog removed` });
+    } catch (error) {
+      messageResult({ error: `${error}` });
     }
   };
 
@@ -109,18 +115,16 @@ const App = () => {
       <Togglable buttonLabel="new note" ref={blogFormRef}>
         <BlogForm createBlog={newBlog} />
       </Togglable>
-      {blogs ? (
-        <>
-          {blogs.map((blog) => (
-            <Blog key={blog.id} blog={blog} addLike={addLike} />
-          ))}
-        </>
-      ) : (
-        <>
-          {console.log('Blog: ', blogs)}
-          'Carregando'
-        </>
-      )}
+      {blogs
+        .sort((a, b) => b.likes - a.likes)
+        .map((blog) => (
+          <Blog
+            key={blog.id}
+            blog={blog}
+            addLike={addLike}
+            removeBlog={removeBlog}
+          />
+        ))}
     </div>
   );
 };
