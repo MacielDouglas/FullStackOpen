@@ -1,15 +1,15 @@
-import { useState } from 'react';
+import { useState } from 'react'
 
 const Blog = ({ blog, addLike, removeBlog }) => {
-  const [showAll, setShoAll] = useState(false);
+  const [showAll, setShoAll] = useState(false)
 
   const handleShow = () => {
-    showAll === false ? setShoAll(true) : setShoAll(false);
-  };
+    showAll === false ? setShoAll(true) : setShoAll(false)
+  }
 
   // Adicionar Like
   const handleAddLike = () => {
-    const id = blog.id;
+    const id = blog.id
 
     const changeBlog = {
       user: blog.user.id,
@@ -17,39 +17,41 @@ const Blog = ({ blog, addLike, removeBlog }) => {
       author: blog.author,
       title: blog.title,
       url: blog.url,
-    };
+    }
 
-    addLike(id, changeBlog);
-  };
+    addLike(id, changeBlog)
+  }
 
   const handleRemove = () => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
-      removeBlog(blog.id);
+      removeBlog(blog.id)
     }
-  };
+  }
 
   return (
-    <div className="blogStyle">
+    <div className="blogStyle blog">
       {showAll ? (
         <>
           <p>
             Title: {blog.title}
-            <button onClick={() => handleShow()}>hide</button> <br />
+            <button onClick={handleShow}>hide</button> <br />
             Url: {blog.url}
             <br />
             Likes: {blog.likes} <button onClick={handleAddLike}>like</button>
             <br />
             Author: {blog.author}
           </p>
-          <button onClick={() => handleRemove()}>remove</button>
+          <button onClick={handleRemove}>remove</button>
         </>
       ) : (
         <p>
           {blog.title}
-          <button onClick={() => handleShow()}>view</button>
+          <button onClick={handleShow} className="btn">
+            view
+          </button>
         </p>
       )}
     </div>
-  );
-};
-export default Blog;
+  )
+}
+export default Blog

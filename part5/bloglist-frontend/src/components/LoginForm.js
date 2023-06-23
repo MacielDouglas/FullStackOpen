@@ -9,24 +9,24 @@ const LoginForm = ({
   setErrorMessage,
 }) => {
   const handleLogin = async (event) => {
-    event.preventDefault();
+    event.preventDefault()
 
     try {
-      const user = await loginService.login({ username, password });
+      const user = await loginService.login({ username, password })
 
-      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user));
+      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
 
-      blogService.setToken(user.token);
-      setUser(user);
-      setUsername('');
-      setPassword('');
+      blogService.setToken(user.token)
+      setUser(user)
+      setUsername('')
+      setPassword('')
     } catch (exception) {
-      setErrorMessage(exception.response.data.error);
+      setErrorMessage(exception.response.data.error)
       setTimeout(() => {
-        setErrorMessage(null);
-      }, 5000);
+        setErrorMessage(null)
+      }, 5000)
     }
-  };
+  }
 
   return (
     <div>
@@ -53,7 +53,7 @@ const LoginForm = ({
         <button type="submit">login</button>
       </form>
     </div>
-  );
-};
+  )
+}
 
-export default LoginForm;
+export default LoginForm
