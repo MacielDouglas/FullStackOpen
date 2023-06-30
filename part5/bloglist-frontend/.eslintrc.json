@@ -1,5 +1,13 @@
 {
+  "env": {
+    "cypress/globals": true
+  },
   "extends": [
     "@rocketseat/eslint-config/react"
+  ],
+  "plugins": [
+    "react",
+    "jest",
+    "cypress"
   ]
 }
