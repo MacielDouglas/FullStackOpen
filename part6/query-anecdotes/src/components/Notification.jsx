@@ -1,18 +1,18 @@
+import { useValueNotification } from '../NotesContext';
+
 const Notification = () => {
-  const style = {
+  const notificationStyle = {
     border: 'solid',
     padding: 10,
     borderWidth: 1,
-    marginBottom: 5
-  }
-  
-  if (true) return null
+    marginBottom: 5,
+  };
 
-  return (
-    <div style={style}>
-      
-    </div>
-  )
-}
+  const notification = useValueNotification();
 
-export default Notification
+  if (!notification) return null;
+
+  return <div style={notificationStyle}>{notification}</div>;
+};
+
+export default Notification;
