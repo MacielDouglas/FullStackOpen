@@ -169,7 +169,7 @@ const App = () => {
   ]);
 
   const [notification, setNotification] = useState(null);
-  const username = useField('text');
+  // const username = useField('text');
 
   const addNew = (anecdote) => {
     anecdote.id = Math.round(Math.random() * 10000);
