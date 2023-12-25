@@ -2,7 +2,7 @@ import { useQuery } from '@apollo/client';
 import { ALL_AUTHORS } from '../queries';
 import SetBorn from './SetBorn.jsx';
 
-const Authors = (props) => {
+const Authors = () => {
   const result = useQuery(ALL_AUTHORS);
 
   if (result.loading) {
@@ -14,6 +14,7 @@ const Authors = (props) => {
   return (
     <div>
       <h2>authors</h2>
+
       <table>
         <tbody>
           <tr>
