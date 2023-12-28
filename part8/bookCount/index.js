@@ -116,8 +116,20 @@ const resolvers = {
     },
   },
   Book: {
+    author: async (root) => {
+      try {
+        // Certifique-se de que o livro tenha o campo 'author'
+        if (root.author) {
+          // Recupere o autor associado ao livro
+          const author = await Author.findById(root.author);
+          return author;
+        }
+        return null; // Retorna null se o livro não tiver um autor
+      } catch (error) {
+        throw new Error(`Error fetching author: ${error.message}`);
+      }
+    },
     title: (root) => root.title || '',
-    author: (root) => root.author,
     published: (root) => root.published,
     genres: (root) => root.genres,
   },
