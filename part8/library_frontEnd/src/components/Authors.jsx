@@ -2,9 +2,8 @@ import { useQuery } from '@apollo/client';
 import { ALL_AUTHORS } from '../queries';
 import SetBorn from './SetBorn.jsx';
 
-const Authors = () => {
+const Authors = ({ token }) => {
   const result = useQuery(ALL_AUTHORS);
-
   if (result.loading) {
     return <div>Loading, Authors....</div>;
   }
@@ -31,7 +30,7 @@ const Authors = () => {
           ))}
         </tbody>
       </table>
-      <SetBorn />
+      {token ? <SetBorn /> : ''}
     </div>
   );
 };

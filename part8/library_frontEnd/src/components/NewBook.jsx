@@ -71,7 +71,7 @@ const NewBook = () => {
             onChange={({ target }) => setGenre(target.value)}
           />
           <button onClick={addGenre} type="button">
-            add genre
+            add
           </button>
         </div>
         <div>genres: {genres.join(' ')}</div>

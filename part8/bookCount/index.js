@@ -49,6 +49,7 @@ const typeDefs = gql`
     allAuthors: [Author!]!
     dummy: Int
     me: User
+    userFavoriteGenre: String
   }
 
   type User {
@@ -113,6 +114,16 @@ const resolvers = {
     },
     me: (root, args, context) => {
       return context.currentUser;
+    },
+    userFavoriteGenre: (root, args, context) => {
+      if (!context.currentUser) {
+        throw new GraphQLError('User not authenticated', {
+          extensions: {
+            code: 'UNAUTHORIZED',
+          },
+        });
+      }
+      return context.currentUser.favoriteGenre;
     },
   },
   Book: {
@@ -291,7 +302,11 @@ const serverConfig = {
           process.env.JWT_SECRET,
         );
         currentUser = User.findById(decodedToken.id);
+
+        // console.log('Decoded Token:', decodedToken);
+        // console.log('Current User:', currentUser);
       } catch (error) {
+        // console.error('Error decoding token:', error);
         return error;
         // Se o token não for válido, não define currentUser
       }

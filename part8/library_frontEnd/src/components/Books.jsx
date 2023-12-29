@@ -1,25 +1,77 @@
+import { useState } from 'react';
 import { useQuery } from '@apollo/client';
 import { ALL_BOOKS } from '../queries';
 
-const Books = () => {
-  const result = useQuery(ALL_BOOKS);
+const Genre = ({ selectedGenre, setSelectedGenre }) => {
+  const { loading, data } = useQuery(ALL_BOOKS);
 
-  if (result.loading) {
-    return <div>Loading, Books....</div>;
+  if (loading) {
+    return <div>Loading Genres...</div>;
   }
 
-  const books = result.data.allBooks;
+  const books = data.allBooks;
+
+  const genres = [
+    ...new Set(
+      books
+        .map((a) => a.genres)
+        .flat()
+        .sort(),
+    ),
+  ];
+
+  const handleGenreClick = (genre) => {
+    setSelectedGenre(genre === selectedGenre ? null : genre);
+  };
 
   return (
     <div>
-      <h2>books</h2>
+      {genres.map((item) => (
+        <button
+          key={item}
+          style={{
+            fontWeight: item === selectedGenre ? 'bold' : 'normal',
+          }}
+          onClick={() => handleGenreClick(item)}
+        >
+          {item}
+        </button>
+      ))}
+      <button key="allGenres" onClick={() => setSelectedGenre(null)}>
+        all genres
+      </button>
+    </div>
+  );
+};
 
+const Books = () => {
+  const [selectedGenre, setSelectedGenre] = useState(null);
+  const { loading, data } = useQuery(ALL_BOOKS, {
+    variables: { genre: selectedGenre },
+  });
+
+  if (loading) {
+    return <div>Loading Books....</div>;
+  }
+
+  const books = data.allBooks;
+
+  return (
+    <div>
+      <h2>Books</h2>
+      {selectedGenre !== null ? (
+        <p>
+          in genre <span style={{ fontWeight: 'bold' }}>{selectedGenre}</span>
+        </p>
+      ) : (
+        ''
+      )}
       <table>
         <tbody>
           <tr>
-            <th></th>
-            <th>author</th>
-            <th>published</th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Published</th>
           </tr>
           {books.map((a) => (
             <tr key={a.title}>
@@ -30,6 +82,10 @@ const Books = () => {
           ))}
         </tbody>
       </table>
+      <Genre
+        selectedGenre={selectedGenre}
+        setSelectedGenre={setSelectedGenre}
+      />
     </div>
   );
 };
