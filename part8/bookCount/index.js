@@ -302,13 +302,8 @@ const serverConfig = {
           process.env.JWT_SECRET,
         );
         currentUser = User.findById(decodedToken.id);
-
-        // console.log('Decoded Token:', decodedToken);
-        // console.log('Current User:', currentUser);
       } catch (error) {
-        // console.error('Error decoding token:', error);
         return error;
-        // Se o token não for válido, não define currentUser
       }
     }
 

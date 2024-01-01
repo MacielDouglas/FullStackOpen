@@ -1,19 +1,30 @@
-import { useMutation } from '@apollo/client';
-import { LOGIN } from '../queries';
+export default function Recommend({ user, books }) {
+  const favoriteGenre = user ? user.favoriteGenre : null;
 
-export default function Recommend() {
-  const [login, result] = useMutation(LOGIN, {
-    // onError: (error) => {
-    //   setError(error.graphQLErrors[0].message);
-    // },
-  });
+  const filteredBook = books.filter((book) =>
+    book.genres.includes(favoriteGenre),
+  );
 
-  console.log(login);
-  console.log(result.data);
   return (
     <div>
       <h2>Recommendations</h2>
-      <p>books in you favorite genre</p>
+      <p>books in your favorite genres {favoriteGenre} </p>
+      <table>
+        <tbody>
+          <tr>
+            <th></th>
+            <th>author</th>
+            <th>published</th>
+          </tr>
+          {filteredBook.map((a) => (
+            <tr key={a.title}>
+              <td>{a.title}</td>
+              <td>{a.author.name}</td>
+              <td>{a.published}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
