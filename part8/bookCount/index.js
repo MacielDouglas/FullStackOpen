@@ -1,54 +1,90 @@
-const { ApolloServer, gql } = require('apollo-server');
-
+const { ApolloServer } = require('@apollo/server');
+const { expressMiddleware } = require('@apollo/server/express4');
+const {
+  ApolloServerPluginDrainHttpServer,
+} = require('@apollo/server/plugin/drainHttpServer');
+const { makeExecutableSchema } = require('@graphql-tools/schema');
+const express = require('express');
+const cors = require('cors');
+const http = require('http');
 const jwt = require('jsonwebtoken');
+const { WebSocketServer } = require('ws');
+const { useServer } = require('graphql-ws/lib/use/ws');
+
 const mongoose = require('mongoose');
+mongoose.set('strictQuery', false);
 
-const Author = require('./models/author');
-const Book = require('./models/book');
 const User = require('./models/user');
-
 const typeDefs = require('./schema');
-const resolvers = require('./revolvers');
+const resolvers = require('./revolvers'); // Se você separou seu schema e resolvers
 
 require('dotenv').config();
 
-const MONGO_URI = process.env.MONGO_URI;
+const { MONGO_URI, JWT_SECRET, PORT = 4000 } = process.env;
+
+console.log('connecting to', MONGO_URI);
 
 mongoose
   .connect(MONGO_URI)
   .then(() => {
-    console.log('Connected to MongoDB');
+    console.log('connected to MongoDB');
   })
   .catch((error) => {
-    console.error('Error connecting to MongoDB:', error.message);
-    process.exit(1); // Encerrar o processo em caso de falha na conexão
+    console.log('error connection to MongoDB:', error.message);
   });
 
-const serverConfig = {
-  typeDefs,
-  resolvers,
-  context: ({ req }) => {
-    const auth = req ? req.headers.authorization : null;
-    let currentUser = null;
+const start = async () => {
+  const app = express();
+  const httpServer = http.createServer(app);
 
-    if (auth && auth.startsWith('Bearer ')) {
-      try {
-        const decodedToken = jwt.verify(
-          auth.substring(7),
-          process.env.JWT_SECRET,
-        );
-        currentUser = User.findById(decodedToken.id);
-      } catch (error) {
-        return error;
-      }
-    }
+  const wsServer = new WebSocketServer({
+    server: httpServer,
+    path: '/',
+  });
 
-    return { currentUser };
-  },
+  const schema = makeExecutableSchema({ typeDefs, resolvers });
+  const serverCleanup = useServer({ schema }, wsServer);
+
+  const server = new ApolloServer({
+    schema,
+    plugins: [
+      ApolloServerPluginDrainHttpServer({ httpServer }),
+      {
+        async serverWillStart() {
+          return {
+            async drainServer() {
+              await serverCleanup.dispose();
+            },
+          };
+        },
+      },
+    ],
+  });
+
+  await server.start();
+
+  app.use(
+    '/',
+    cors(),
+    express.json(),
+    expressMiddleware(server, {
+      context: async ({ req }) => {
+        const auth = req ? req.headers.authorization : null;
+
+        if (auth && auth.startsWith('Bearer ')) {
+          const decodedToken = jwt.verify(auth.substring(7), JWT_SECRET);
+          const currentUser = await User.findById(decodedToken.id);
+          return { currentUser };
+        }
+      },
+    }),
+  );
+
+  app.use(express.static('build'));
+
+  httpServer.listen(PORT, () =>
+    console.log(`Server ready at  http://localhost:${PORT}`),
+  );
 };
 
-const server = new ApolloServer(serverConfig);
-
-server.listen({ port: 4000 }).then(({ url }) => {
-  console.log(`Server ready at ${url}`);
-});
+start();

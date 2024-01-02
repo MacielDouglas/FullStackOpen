@@ -5,14 +5,10 @@ const schema = new mongoose.Schema({
     type: String,
     required: true,
     minlength: 3,
-    favoriteGenre: String,
+    favoriteGenre: {
+      type: String,
+    },
   },
-  // favoriteGenre: [
-  //   {
-  //     type: mongoose.Schema.Types.ObjectId,
-  //     ref: 'Person'
-  //   }
-  // ],
 });
 
 module.exports = mongoose.model('User', schema);
