@@ -18,6 +18,7 @@ const BOOK_DETAILS = gql`
 export const ALL_AUTHORS = gql`
   query {
     allAuthors {
+      id
       name
       bookCount
       born
