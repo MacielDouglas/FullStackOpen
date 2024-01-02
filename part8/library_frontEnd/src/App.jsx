@@ -7,10 +7,15 @@ import LoginForm from './components/LoginForm';
 import { useState } from 'react';
 import Notify from './components/Notify';
 import Recommend from './components/Recommend';
+import { useQuery } from '@apollo/client';
+import { USER } from './queries';
 
 export default function App() {
   const [token, setToken] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
+  const user = useQuery(USER);
+
+  // console.log(user.data.me);
 
   const notify = (message) => {
     setErrorMessage(message);

@@ -3,10 +3,8 @@ import App from './App.jsx';
 import {
   ApolloClient,
   ApolloProvider,
-  // HttpLink,
   InMemoryCache,
   createHttpLink,
-  // gql,
 } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 
