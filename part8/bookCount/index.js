@@ -16,7 +16,7 @@ mongoose.set('strictQuery', false);
 
 const User = require('./models/user');
 const typeDefs = require('./schema');
-const resolvers = require('./revolvers'); // Se você separou seu schema e resolvers
+const resolvers = require('./resolvers'); // Se você separou seu schema e resolvers
 
 require('dotenv').config();
 

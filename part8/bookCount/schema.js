@@ -17,16 +17,9 @@ const typeDefs = `
   type Query {
     bookCount: Int!
     authorCount: Int!
-    allBooks(
-      author: String
-      genre: String
-      title: String
-      published: Int
-    ): [Book]!
+    allBooks(author: String, genres: String): [Book!]!
     allAuthors: [Author!]!
-    dummy: Int
     me: User
-    userFavoriteGenre: String
   }
 
   type User {
@@ -54,6 +47,9 @@ const typeDefs = `
     createUser(username: String!, favoriteGenre: String!): User
 
     login(username: String!, password: String!): Token
+  }
+  type Subscription {
+    bookAdded: Book!
   }
 `;
 
