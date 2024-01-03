@@ -1,12 +1,13 @@
-type BmiCategory = 'Underweight' | 'Normal(Healthy Weight)' | 'Overweight' | 'Obese';
+export type BmiCategory = 'Underweight' | 'Normal(Healthy Weight)' | 'Overweight' | 'Obese';
 
-interface BmiResult {
+export interface BmiResult {
   bmi: number;
   category: BmiCategory;
 }
 
-function calculateBmi(weightKg: number, heightM: number): BmiResult {
-  const bmi = weightKg / (heightM * heightM);
+export function calculateBmi(heightM: number, weightK: number): BmiResult {
+
+  const bmi =  weightK / ((heightM / 100) * (heightM / 100) );
 
   let category: BmiCategory;
 
@@ -24,29 +25,4 @@ function calculateBmi(weightKg: number, heightM: number): BmiResult {
     bmi: parseFloat(bmi.toFixed(2)), // Round to two decimal places
     category,
   };
-}
-
-function parseInput(args: string[]): { weight: number; height: number } {
-  if (args.length !== 4) {
-    throw new Error('Invalid number of arguments. Usage: node script.js <weight> <height>');
-  }
-
-  const weight = parseFloat(args[2]);
-  const height = parseFloat(args[3]);
-
-  if (isNaN(weight) || isNaN(height)) {
-    throw new Error('Invalid arguments. Please provide valid weight and height values.');
-  }
-
-  return { weight, height };
-}
-
-try {
-  const { weight, height } = parseInput(process.argv);
-  const result = calculateBmi(weight, height);
-
-  console.log(`BMI: ${result.bmi}`);
-  console.log(`Category: ${result.category}`);
-} catch (error) {
-  console.error(error.message);
 }
