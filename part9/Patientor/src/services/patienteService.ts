@@ -1,5 +1,6 @@
 import patients from '../../data/patients';
-import { NonSensitivePatientEntry, PatientEntry } from '../types';
+import { NonSensitivePatientEntry, PatientEntry, NewPatientEntry } from '../types';
+const { v4: uuidv4 } = require('uuid');
 
 const getEntries = (): PatientEntry[] => {
   return patients;
@@ -15,10 +16,14 @@ const getNonSensitiveEntries = (): NonSensitivePatientEntry[] => {
   }));
 };
 
-const addPatient = (patient: PatientEntry): PatientEntry => {
-  // Adicionar a lógica real de adicionar pacientes aqui.
-  // Por enquanto, estamos apenas retornando o mesmo paciente que recebemos.
-  return patient;
+const addPatient = (entry: NewPatientEntry): PatientEntry => {
+  const newPatientEntry = {
+    id: uuidv4(),
+    ...entry
+  };
+
+  patients.push(newPatientEntry);
+  return newPatientEntry;
 };
 
 const findById = (id: string): PatientEntry | undefined => {
