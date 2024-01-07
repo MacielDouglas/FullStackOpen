@@ -1,11 +1,10 @@
-interface ContentProps {
-  courses:{ name: string; exerciseCount: number }[];
-}
+import { Parts } from "../types";
+import Part from "./Part";
 
-
-export default function Content(props: ContentProps) {
-  const courses = props.courses
+export default function Content(props: Parts) {
   return (
- courses.map(item => <p key={item.name}>{item.name} {item.exerciseCount}</p>)
+    <div>
+      <Part courses = {props.courses} />
+    </div>
   )
 }
