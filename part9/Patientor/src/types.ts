@@ -5,7 +5,6 @@ export enum Gender {
   Other = 'other',
 }
 
-
 export interface DiagnosisEntry {
   code: string;
   name: string;
@@ -19,7 +18,7 @@ export enum HealthCheckRating {
   "CriticalRisk" = 3
 }
 
-interface BaseEntry {
+export interface BaseEntry {
   id: string;
   description: string;
   date: string;
@@ -27,26 +26,32 @@ interface BaseEntry {
   diagnosisCodes?: Array<DiagnosisEntry['code']>;
 }
 
+export type NewBaseEntry = Omit<BaseEntry, 'id'>;
+
 interface HealthCheckEntry extends BaseEntry {
   type: "HealthCheck";
   healthCheckRating: HealthCheckRating;
 }
 
-interface HospitalEntry extends BaseEntry {
-	type: 'Hospital';
-	discharge: {
-		date: string,
-		criteria: string
-	};
+export interface Discharge {
+  date: string;
+  criteria: string;
 }
 
-interface OccupationalHealthcareEntry extends BaseEntry {
-	type: 'OccupationalHealthcare';
-	employerName: string;
-	sickLeave?: {
-		startDate: string,
-		endDate: string
-	};
+export interface HospitalEntry extends BaseEntry {
+  type: "Hospital";
+  discharge: Discharge;
+}
+
+export interface SickLeave {
+  startDate: string;
+  endDate: string;
+}
+
+export interface OccupationalHealthcareEntry extends BaseEntry {
+  type: "OccupationalHealthcare";
+  employerName: string;
+  sickLeave?: SickLeave;
 }
 
 export type Entry =
@@ -55,17 +60,13 @@ export type Entry =
   | HealthCheckEntry;
 
 
-  // type UnionOmit<T, K extends string | number | symbol> = T extends unknown ? Omit<T, K> : never;
-
-  // type EntryWithoutId = UnionOmit<Entry, 'id'>;
-
 export interface BasePatientEntry {
   id: string;
   name: string;
   dateOfBirth: string;
   gender: Gender;
   occupation: string;
-  ssn: string;
+  ssn?: string;
   entries: Entry[]
 }
 
@@ -76,3 +77,14 @@ export interface PatientEntry extends BasePatientEntry {
 export type NewPatientEntry = Omit<PatientEntry, 'id'>;
 
 export type NonSensitivePatientEntry = Omit<BasePatientEntry, 'ssn' | 'entries'>;
+
+export type NoSsnPatient = Omit<BasePatientEntry, 'ssn'>;
+
+type UnionOmit<T, K extends string | number | symbol> 
+    = T extends unknown ?
+        Omit<T, K> 
+        : never;
+
+export type EntryWithoutId = UnionOmit<Entry, 'id'>;
+
+
